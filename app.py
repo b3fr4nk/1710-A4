@@ -109,7 +109,18 @@ def comparison_results():
 
     results1 = get_weather(params1)
     results2 = get_weather(params2)
-    print(results2)
+
+    try:
+        if results1["name"].lower() != city1:
+            return render_template('404.html')
+    except:
+        return render_template('404.html')
+
+    try:
+        if results2["name"].lower() != city2:
+            return render_template('404.html')
+    except:
+        return render_template('404.html')
 
     # TODO: Pass the information for both cities in the context. Make sure to
     # pass info for the temperature, humidity, wind speed, and sunset time!
