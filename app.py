@@ -89,24 +89,73 @@ def comparison_results():
     """Displays the relative weather for 2 different cities."""
     # TODO: Use 'request.args' to retrieve the cities & units from the query
     # parameters.
-    city1 = ''
-    city2 = ''
-    units = ''
+    city1 = request.args.get("city1")
+    city2 = request.args.get("city2")
+    units = request.args.get("units")
 
     # TODO: Make 2 API calls, one for each city. HINT: You may want to write a 
     # helper function for this!
+    params1 = {
+        "q":city1,
+        "units":units,
+        "appid":API_KEY
+    }
 
+    params2 = {
+        "q":city2,
+        "units":units,
+        "appid":API_KEY
+    }
+
+    results1 = get_weather(params1)
+    results2 = get_weather(params2)
+    print(results2)
 
     # TODO: Pass the information for both cities in the context. Make sure to
     # pass info for the temperature, humidity, wind speed, and sunset time!
     # HINT: It may be useful to create 2 new dictionaries, `city1_info` and 
     # `city2_info`, to organize the data.
     context = {
-
+        "date":datetime.now(),
+        "city1_name":city1,
+        "city1_info":{
+            "temp":results1['main']["temp"],
+            "humidity":results1["main"]["humidity"],
+            "wind_speed":results1["main"]["humidity"],
+            'sunset': datetime.fromtimestamp(results1["sys"]["sunset"])
+        },
+        "city2_name":city2,
+        "city2_info":{
+            "temp":results2["main"]["temp"],
+            "humidity":results2["main"]["humidity"],
+            "wind_speed":results2["main"]["humidity"],
+            'sunset': datetime.fromtimestamp(results2["sys"]["sunset"])
+        },
+        "units":get_units(units)
     }
 
     return render_template('comparison_results.html', **context)
 
+def get_weather(params):
+    print(params)
+    return requests.get(API_URL, params=params).json()
+
+def get_units(unit):
+    if unit == "metric":
+        return {
+            "speed":"km/h",
+            "temp":"C"
+        }
+    if unit == "imperial":
+        return {
+            "speed":"mph",
+            "temp":"F"
+        }
+    if unit == "kelvin":
+        return {
+            "speed":"km/h",
+            "temp":"K"
+        }
 
 if __name__ == '__main__':
     app.config['ENV'] = 'development'
